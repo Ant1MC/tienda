@@ -1,0 +1,57 @@
+import sqlite3
+
+def crear_base_datos():
+    # Conectar o crear la base de datos
+    conn = sqlite3.connect("tienda.db")
+    cursor = conn.cursor()
+
+    # Crear tablas si no existen
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS productos (
+        id INTEGER PRIMARY KEY,
+        nombre TEXT,
+        precio REAL,
+        imagen TEXT
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS clientes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        correo TEXT UNIQUE
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS empleados (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        puesto TEXT
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS proveedores (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT,
+        producto TEXT
+    )
+    ''')
+
+    # Productos iniciales
+    productos_iniciales = [
+        (1, "Laptop", 5000, "https://p1-ofp.static.pub/fes/cms/2021/12/17/ephit8bi4waypyhk5ayf20s55uhtf3918030.png"),
+        (2, "Celular", 3000, "https://castillo.vtexassets.com/arquivos/ids/170086/CELULAR-LIBRE-TECNO-SPARK-20C-.jpg?v=638820687566930000"),
+        (3, "Audífonos", 350, "https://png.pngtree.com/png-vector/20250321/ourmid/pngtree-wireless-headphone-png-image_15830312.png")
+    ]
+
+    for p in productos_iniciales:
+        cursor.execute("INSERT OR IGNORE INTO productos (id, nombre, precio, imagen) VALUES (?, ?, ?, ?)", p)
+
+    conn.commit()
+    conn.close()
+    print("Base de datos creada y productos iniciales insertados.")
+
+if __name__ == "__main__":
+    crear_base_datos()
