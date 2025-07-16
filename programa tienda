@@ -1,0 +1,147 @@
+import sqlite3
+
+# --- Conectar o crear la base de datos ---
+conn = sqlite3.connect("tienda.db")
+cursor = conn.cursor()
+
+# --- Crear tablas si no existen ---
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS productos (
+    id INTEGER PRIMARY KEY,
+    nombre TEXT,
+    precio REAL,
+    imagen TEXT
+)
+''')
+
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS clientes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT,
+    correo TEXT
+)
+''')
+
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS empleados (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT,
+    puesto TEXT
+)
+''')
+
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS proveedores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT,
+    producto TEXT
+)
+''')
+
+conn.commit()
+
+# --- Productos iniciales (si aún no existen) ---
+productos_iniciales = [
+    (1, "Laptop", 5000, "https://p1-ofp.static.pub/fes/cms/2021/12/17/ephit8bi4waypyhk5ayf20s55uhtf3918030.png"),
+    (2, "Celular", 3000, "https://castillo.vtexassets.com/arquivos/ids/170086/CELULAR-LIBRE-TECNO-SPARK-20C-.jpg?v=638820687566930000"),
+    (3, "Audífonos", 350, "https://png.pngtree.com/png-vector/20250321/ourmid/pngtree-wireless-headphone-png-image_15830312.png")
+]
+
+for p in productos_iniciales:
+    cursor.execute("INSERT OR IGNORE INTO productos (id, nombre, precio, imagen) VALUES (?, ?, ?, ?)", p)
+conn.commit()
+
+# --- Funciones para mostrar productos ---
+def mostrar_productos():
+    print("\nProductos disponibles:")
+    cursor.execute("SELECT * FROM productos")
+    for producto in cursor.fetchall():
+        print(f"ID: {producto[0]}")
+        print(f"Nombre: {producto[1]}")
+        print(f"Precio: Q{producto[2]}")
+        print(f"Imagen: {producto[3]}\n")
+
+# --- Registro de cliente ---
+def registrar_cliente():
+    nombre = input("Ingrese el nombre del cliente: ")
+    correo = input("Ingrese el correo del cliente: ")
+    cursor.execute("INSERT INTO clientes (nombre, correo) VALUES (?, ?)", (nombre, correo))
+    conn.commit()
+    print("✅ Cliente registrado.\n")
+
+# --- Registro de empleado ---
+def registrar_empleado():
+    nombre = input("Ingrese el nombre del empleado: ")
+    puesto = input("Ingrese el puesto del empleado: ")
+    cursor.execute("INSERT INTO empleados (nombre, puesto) VALUES (?, ?)", (nombre, puesto))
+    conn.commit()
+    print("✅ Empleado registrado.\n")
+
+# --- Registro de proveedor ---
+def registrar_proveedor():
+    nombre = input("Ingrese el nombre del proveedor: ")
+    producto = input("Producto que proporciona: ")
+    cursor.execute("INSERT INTO proveedores (nombre, producto) VALUES (?, ?)", (nombre, producto))
+    conn.commit()
+    print("✅ Proveedor registrado.\n")
+
+# --- Mostrar clientes, empleados y proveedores ---
+def ver_clientes():
+    cursor.execute("SELECT * FROM clientes")
+    print("\nClientes registrados:")
+    for c in cursor.fetchall():
+        print(f"- {c[1]} | {c[2]}")
+
+def ver_empleados():
+    cursor.execute("SELECT * FROM empleados")
+    print("\nEmpleados registrados:")
+    for e in cursor.fetchall():
+        print(f"- {e[1]} | {e[2]}")
+
+def ver_proveedores():
+    cursor.execute("SELECT * FROM proveedores")
+    print("\nProveedores registrados:")
+    for p in cursor.fetchall():
+        print(f"- {p[1]} | Producto: {p[2]}")
+
+# --- Menú principal ---
+def menu():
+    while True:
+        print("\n--- MENÚ DE TIENDA ONLINE ---")
+        print("1. Ver productos")
+        print("2. Registrar cliente")
+        print("3. Registrar empleado")
+        print("4. Registrar proveedor")
+        print("5. Ver clientes")
+        print("6. Ver empleados")
+        print("7. Ver proveedores")
+        print("0. Salir")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == "1":
+            mostrar_productos()
+        elif opcion == "2":
+            registrar_cliente()
+        elif opcion == "3":
+            registrar_empleado()
+        elif opcion == "4":
+            registrar_proveedor()
+        elif opcion == "5":
+            ver_clientes()
+        elif opcion == "6":
+            ver_empleados()
+        elif opcion == "7":
+            ver_proveedores()
+        elif opcion == "0":
+            print("Saliendo del programa. ¡Gracias por visitar la tienda!")
+            break
+        else:
+            print("Opción no válida. Intente de nuevo.")
+
+# --- Ejecutar programa ---
+menu()
+
+# --- Cerrar conexión al salir ---
+conn.close()
+
+
